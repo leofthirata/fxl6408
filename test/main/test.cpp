@@ -72,24 +72,6 @@ void stm66_int_task(void *arg)
     }
 }
 
-void int_status_task(void *arg)
-{
-    uint8_t status = 0;
-
-    GpioExpander::GpioExpander *expander = static_cast<GpioExpander::GpioExpander *>(arg);
-
-    for (;;)
-    {
-        expander->fxl6408_read_it_status(&status);
-        printf("status %u\r\n", status);
-
-        expander->fxl6408_read_input_status(&status);
-        printf("status %u\r\n", status);
-
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
-    }
-}
-
 extern "C" void app_main(void)
 {
     I2C::I2CMaster *i2c = new I2C::I2CMaster();
@@ -110,10 +92,12 @@ extern "C" void app_main(void)
     fxl6408_test_communication(dev);
     fxl6408_test_reset(dev);
     
-    // STM66_INT
     dev->fxl6408_set_io_dir(FXL6408_GPIO_5, FXL6408_GPIO_MODE_INPUT);
     dev->fxl6408_set_it_mask(FXL6408_GPIO_5, FXL6408_GPIO_NO_MASK);
     dev->fxl6408_set_input_state(FXL6408_GPIO_5, FXL6408_GPIO_INPUT_DEFAULT_HIGH);
+
+    dev->fxl6408_set_io_dir(FXL6408_GPIO_6, FXL6408_GPIO_MODE_OUTPUT);
+    dev->fxl6408_set_io_level(FXL6408_GPIO_6, FXL6408_GPIO_LEVEL_HIGH);
 
     dev->fxl6408_set_task(&thread, GpioExpander::GPIO_EXPANDER_IO_5);
 
