@@ -286,9 +286,11 @@ esp_err_t GpioExpander::fxl6408_read_io_level(uint8_t *output)
 
 esp_err_t GpioExpander::fxl6408_set_io_level(uint8_t gpio, uint8_t output)
 {
+    esp_err_t err = fxl6408_set_io_highz(gpio, FXL6408_GPIO_LEVEL_NO_HIGHZ);
+
     uint8_t read_output = 0;
 
-    esp_err_t err = fxl6408_read_io_level(&read_output);
+    err = fxl6408_read_io_level(&read_output);
     if (err != ESP_OK) return err;
 
     uint8_t new_output = read_output;
